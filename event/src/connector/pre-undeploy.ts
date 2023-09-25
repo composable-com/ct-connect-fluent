@@ -28,7 +28,6 @@ async function run(): Promise<void> {
 
 
     while (true) {
-      console.log('page ----> ',page);
       const { 
         body: { results, total }
     } = await createApiRoot()
@@ -66,7 +65,6 @@ async function run(): Promise<void> {
           )
           .map(async (fluentVariant) => await createVariantProduct(fluentVariant));
         await Promise.all(createFluentProductVariants);
-        console.log('fluentStandardProduct created -----> ', name[FLUENT_CATALOG_LOCALE]);
       });
       await Promise.all(productsPromise);
 

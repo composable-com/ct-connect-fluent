@@ -46,9 +46,7 @@ export const getFluentProductVariant = (params: {
   fluentCategories: string[] | [],
  }): FluentVariantProduct => {
   const { product, fluentCategories, fluentStandardProductRef, productName, productDescription } = params;
-  console.log('==========================')
-  console.log('product SKU', product.sku!)
-  console.log('==========================')
+
   const fluentImages = product.images?.map((image) => ({
     name: 'imageUrl',
     type: 'STRING',

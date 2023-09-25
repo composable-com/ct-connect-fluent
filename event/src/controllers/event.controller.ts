@@ -63,7 +63,7 @@ export const post = async (request: Request, response: Response) => {
     ).data;
 
     const { type } = payload;
-    console.log('EventType', type)
+    
     if (type === 'ProductPublished') {
       const { productProjection } = payload;
       // We only want to process products with a key
@@ -72,7 +72,7 @@ export const post = async (request: Request, response: Response) => {
         return;
       }
 
-      logger.info(`Processing ProductPublished x: ${productProjection.key}`);
+      logger.info(`Processing ProductPublished: ${productProjection.key}`);
 
       const { name, description, key, variants, masterVariant } = productProjection;
 
@@ -84,7 +84,6 @@ export const post = async (request: Request, response: Response) => {
       });
 
       await createStandardProduct(fluentStandardProduct);
-      console.log('fluentStandardProduct -----> ', fluentStandardProduct);
       const createFluentProductVariants = [masterVariant ,...variants]
       .filter(variant => variant.sku)
       .map(variant => 
@@ -160,7 +159,6 @@ export const post = async (request: Request, response: Response) => {
     }
     response.status(204).send();
   } catch (error) {
-    console.log('error', error)
     logger.info(`Event message error: ${(error as Error).message}`);
     response.status(400);
     response.send();
