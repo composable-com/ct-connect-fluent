@@ -11,8 +11,11 @@ export const getFluentStandardProduct = (params: {
   productCategories?: string[],
   productDescription?: string,
   productKey: string,
-}): FluentStandardProduct => {
+}): FluentStandardProduct | null => {
   const {  productCategories, productName, productKey, productDescription } = params;
+  if (!productName) {
+    return null;
+  }
 
   return {
     "retailerId": FLUENT_RETAILER_ID,
@@ -28,7 +31,7 @@ export const getFluentStandardProduct = (params: {
       "status": "ACTIVE",
       "gtin": "NOTFORSALE", // The Standard Product is NOTFORSALE
       "name": productName,
-      "summary": productDescription,
+      "summary": productDescription?.substring(0, 255) ?? '',
       "categoryRefs": productCategories ?? [],
     }
   }
@@ -79,7 +82,7 @@ export const getFluentProductVariant = (params: {
       "status": "ACTIVE",
       "gtin": "D45", // The Variant Product is D45 it has to be present in order to display the product in fluent
       "name": productName, // From CT I only have the SKU, what should I use here?
-      "summary": productDescription, // same here
+      "summary": productDescription?.substring(0, 255) ?? '',
       "standardProductRef": fluentStandardProductRef,
       "attributes": [
         ...(fluentImages && fluentImages?.length > 0 ? fluentImages : []),
@@ -125,6 +128,10 @@ export const formatCommercetoolsMoney = (money?: TypedMoney) => {
 };
 
 const getDefaultAddress = (addresses: any[]) => {
+  if (addresses.length === 1) {
+    return addresses[0];
+  }
+
   return addresses.find((address) => address.isDefaultShippingAddress);
 }
 
@@ -133,14 +140,14 @@ export const getFluentCustomer = (customer: Customer) => {
 
   return {
     username: customer.email!,
-    department: defaultAddress.department ?? '',
-    country: defaultAddress.country ?? '',
+    department: defaultAddress?.department ?? '',
+    country: defaultAddress?.country ?? '',
     firstName: customer.firstName ?? '',
     lastName: customer.lastName ?? '',
     primaryEmail: customer.email ?? '',
-    primaryPhone: defaultAddress.phone ?? '',
-    timezone: defaultAddress.timeZone ?? '',
-    promotionOptIn: true, // What does this flag?
+    primaryPhone: defaultAddress?.phone ?? '',
+    timezone: defaultAddress?.timeZone ?? '',
+    promotionOptIn: true,
     retailer: {
       id: Number(FLUENT_RETAILER_ID)
     }
@@ -160,7 +167,7 @@ export const getFluentOrder = (order: Order, customerId?: number | undefined): F
     paidPrice: 0,
     totalPrice: formatCommercetoolsMoney(lineItem.totalPrice),
     taxPrice: formatCommercetoolsMoney(lineItem.taxedPrice?.totalTax),
-    totalTaxPrice: formatCommercetoolsMoney(lineItem.taxedPrice?.totalGross),
+    totalTaxPrice: formatCommercetoolsMoney(lineItem.taxedPrice?.totalTax),
     currency: currencyCode,
   }));
 
@@ -205,9 +212,10 @@ export const getFluentOrder = (order: Order, customerId?: number | undefined): F
 
 export const getFluentTransaction = (payment: Payment, orderId: number): CreateFinancialTransactionInput => {
   const lastTransaction = payment.transactions[payment.transactions.length - 1];
+
   return {
     ref: lastTransaction.id,
-    type: "PAYMENT",
+    type: 'PAYMENT',
     amount: formatCommercetoolsMoney(lastTransaction.amount),
     currency: lastTransaction.amount.currencyCode,
     paymentMethod: payment.paymentMethodInfo.method ?? '',
@@ -215,7 +223,5 @@ export const getFluentTransaction = (payment: Payment, orderId: number): CreateF
     order: {
       id: orderId
     }
-
   }
-
 }

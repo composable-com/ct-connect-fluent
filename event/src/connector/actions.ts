@@ -1,9 +1,8 @@
 import { ByProjectKeyRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder';
 
-const PRODUCT_PUBLISHED_SUBSCRIPTION_KEY =
-  'myconnector-productPublishedSubscription';
+const MY_SUBSCRIPTION_KEY = 'ct-connect-fluent-subscription';
 
-export async function createProductPublishedSubscription(
+export async function createMySubscription(
   apiRoot: ByProjectKeyRequestBuilder,
   topicName: string,
   projectId: string
@@ -14,7 +13,7 @@ export async function createProductPublishedSubscription(
     .subscriptions()
     .get({
       queryArgs: {
-        where: `key = "${PRODUCT_PUBLISHED_SUBSCRIPTION_KEY}"`,
+        where: `key = "${MY_SUBSCRIPTION_KEY}"`,
       },
     })
     .execute();
@@ -24,7 +23,7 @@ export async function createProductPublishedSubscription(
 
     await apiRoot
       .subscriptions()
-      .withKey({ key: PRODUCT_PUBLISHED_SUBSCRIPTION_KEY })
+      .withKey({ key: MY_SUBSCRIPTION_KEY })
       .delete({
         queryArgs: {
           version: subscription.version,
@@ -37,24 +36,32 @@ export async function createProductPublishedSubscription(
     .subscriptions()
     .post({
       body: {
-        key: PRODUCT_PUBLISHED_SUBSCRIPTION_KEY,
+        key: MY_SUBSCRIPTION_KEY,
         destination: {
           type: 'GoogleCloudPubSub',
           topic: topicName,
           projectId,
+        },
+        format: {
+          type: 'CloudEvents',
+          cloudEventsVersion: '1.0',
         },
         messages: [
           {
             resourceTypeId: 'product',
             types: ['ProductPublished'],
           },
+          {
+            resourceTypeId: 'order',
+            types: ['OrderCreated'],
+          }
         ],
       },
     })
     .execute();
 }
 
-export async function deleteProductPublishedSubscription(
+export async function deleteMySubscription(
   apiRoot: ByProjectKeyRequestBuilder
 ): Promise<void> {
   const {
@@ -63,7 +70,7 @@ export async function deleteProductPublishedSubscription(
     .subscriptions()
     .get({
       queryArgs: {
-        where: `key = "${PRODUCT_PUBLISHED_SUBSCRIPTION_KEY}"`,
+        where: `key = "${MY_SUBSCRIPTION_KEY}"`,
       },
     })
     .execute();
@@ -73,7 +80,7 @@ export async function deleteProductPublishedSubscription(
 
     await apiRoot
       .subscriptions()
-      .withKey({ key: PRODUCT_PUBLISHED_SUBSCRIPTION_KEY })
+      .withKey({ key: MY_SUBSCRIPTION_KEY })
       .delete({
         queryArgs: {
           version: subscription.version,

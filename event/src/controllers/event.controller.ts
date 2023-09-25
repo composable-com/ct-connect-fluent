@@ -63,7 +63,7 @@ export const post = async (request: Request, response: Response) => {
     ).data;
 
     const { type } = payload;
-    
+
     if (type === 'ProductPublished') {
       const { productProjection } = payload;
       // We only want to process products with a key
@@ -83,24 +83,27 @@ export const post = async (request: Request, response: Response) => {
         productCategories: []
       });
 
-      await createStandardProduct(fluentStandardProduct);
-      const createFluentProductVariants = [masterVariant ,...variants]
-      .filter(variant => variant.sku)
-      .map(variant => 
-        getFluentProductVariant({ 
-          product: variant, 
-          productName: name[FLUENT_CATALOG_LOCALE],
-          productDescription: description?.[FLUENT_CATALOG_LOCALE].substring(0, 255),
-          fluentCategories: [], 
-          fluentStandardProductRef: key
-        })
-      )
-      .map((fluentVariant) => createVariantProduct(fluentVariant));
+      if (fluentStandardProduct) {      
+        await createStandardProduct(fluentStandardProduct);
+        const createFluentProductVariants = [masterVariant ,...variants]
+          .filter(variant => variant.sku)
+          .map(variant => 
+            getFluentProductVariant({ 
+              product: variant, 
+              productName: name[FLUENT_CATALOG_LOCALE],
+              productDescription: description?.[FLUENT_CATALOG_LOCALE],
+              fluentCategories: [], 
+              fluentStandardProductRef: key
+            })
+          )
+          .map((fluentVariant) => createVariantProduct(fluentVariant));
 
-      await Promise.all(createFluentProductVariants);
-      
-      logger.info(`Product processed successfully: ${productProjection.key}`);
-      return; 
+        await Promise.all(createFluentProductVariants);
+        
+        logger.info(`Product processed successfully: ${productProjection.key}`);
+        response.status(201).send();
+        return; 
+      }
     }
 
     if (type === 'OrderCreated') {
@@ -145,19 +148,21 @@ export const post = async (request: Request, response: Response) => {
 
       if (order.paymentInfo?.payments?.length) {
         const { body: ctPaymentDetails } = await createApiRoot()
-        .payments()
-        .withId({ ID: order?.paymentInfo?.payments[0].id })
-        .get()
-        .execute();
+          .payments()
+          .withId({ ID: order?.paymentInfo?.payments[0].id })
+          .get()
+          .execute();
 
         const fluentTransaction = getFluentTransaction(ctPaymentDetails, Number(orderId));
 
         await createFinancialTransaction({ input: fluentTransaction });
       }
       
+      response.status(201).send();
       return;
     }
-    response.status(204).send();
+
+    return response.status(204).send();
   } catch (error) {
     logger.info(`Event message error: ${(error as Error).message}`);
     response.status(400);
