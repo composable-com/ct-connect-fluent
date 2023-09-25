@@ -28,22 +28,22 @@ export const standardString: ValidatorCreator = (
   ],
 ];
 
-export const standardEmail: ValidatorCreator = (path, message) => [
-  path,
-  [[required(validator.isEmail), message]],
-];
+// export const standardEmail: ValidatorCreator = (path, message) => [
+//   path,
+//   [[required(validator.isEmail), message]],
+// ];
 
-export const standardNaturalNumber = (path, message) => [
-  path,
-  [
-    [
-      required((value) =>
-        validator.isNumeric(String(value), { no_symbols: true })
-      ),
-      message,
-    ],
-  ],
-];
+// export const standardNaturalNumber = (path, message) => [
+//   path,
+//   [
+//     [
+//       required((value) =>
+//         validator.isNumeric(String(value), { no_symbols: true })
+//       ),
+//       message,
+//     ],
+//   ],
+// ];
 
 export const standardKey = (path, message) => [
   path,
@@ -112,21 +112,21 @@ export const optional =
     ];
   };
 
-export const array =
-  (fn) =>
-  (...args) => {
-    const [path, validators] = fn(...args);
-    return [
-      path,
-      validators.map(([fn, message, validatorArgs]) => [
-        (value, ...args) =>
-          Array.isArray(value) &&
-          value.every((value) => fn(...[value, ...args])),
-        message,
-        validatorArgs,
-      ]),
-    ];
-  };
+// export const array =
+//   (fn) =>
+//   (...args) => {
+//     const [path, validators] = fn(...args);
+//     return [
+//       path,
+//       validators.map(([fn, message, validatorArgs]) => [
+//         (value, ...args) =>
+//           Array.isArray(value) &&
+//           value.every((value) => fn(...[value, ...args])),
+//         message,
+//         validatorArgs,
+//       ]),
+//     ];
+//   };
 
 export const region: ValidatorCreator = (path, message) => [
   path,
