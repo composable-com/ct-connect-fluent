@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosRequestHeaders } from 'axios'
 import { isFuture } from 'date-fns'
+import { logger } from '../utils/logger.utils'
 
 interface CommonHeaderProperties extends AxiosRequestHeaders {
   ExpiredAt: string
@@ -44,7 +45,7 @@ const getAccessToken = async (clientId: string, clientSecret: string, username: 
     )
     .then((res) => res.data)
     .catch((err) => {
-      console.log('Error trying to get access token', err.message)
+      logger.error('Error trying to get access token', err.message)
       throw err
     })
 }

@@ -12,40 +12,14 @@ export interface FluentProduct {
 export interface FluentOrder {
   ref: string;
   retailer: {
-    id: string;
+    id: number;
   };
-  type: 'HD',
+  type: string,
   totalPrice: number;
   totalTaxPrice: number;
-  customer: {
-    id: string;
-  };
+  customer: { id: number };
   items: FluentOrderItem[];
-  fulfilmentChoice: {
-    deliveryType: string;
-    deliveryAddress: {
-      ref: string;
-      name: string;
-      street: string;
-      city: string;
-      postcode: string;
-      state: string;
-      country: string;
-    }
-  }
-}
-
-export interface FluentOrderItem {
-  ref: string;
-  productRef: string;
-  productCatalogueRef: string;
-  quantity: number;
-  price: number;
-  paidPrice: number;
-  totalPrice: number;
-  taxPrice: number;
-  totalTaxPrice: number;
-  currency: string;
+  fulfilmentChoice: FulfilmentChoice;
 }
 
 
@@ -101,4 +75,125 @@ export interface FluentCategoryAttributes {
   status:  string;
   name:    string;
   summary: string;
+}
+
+
+
+export interface GraphQlInput<T> {
+  input: T;
+}
+
+export interface CreateFinancialTransactionInput {
+  ref: string
+  type: string
+  amount: number
+  currency: string
+  externalTransactionCode?: string
+  externalTransactionId?: string
+  cardType?: string;
+  paymentMethod: string
+  paymentProvider: string
+  order: {
+    id: number
+  }
+}
+
+export interface CreateOrderInput {
+  ref: string;
+  type: string;
+  attributes?: Attributes;
+  retailer: {
+    id: number;
+  };
+  totalPrice: number;
+  totalTaxPrice: number;
+  payment?: Payment;
+  fulfilmentChoice: FulfilmentChoice;
+  customer: {
+    id: number;
+  };
+  items: FluentOrderItem[];
+}
+
+export interface CreateOrderAndCustomerInput {
+  ref: string;
+  type: string;
+  attributes?: Attributes;
+  retailer: {
+    id: number;
+  };
+  totalPrice: number;
+  totalTaxPrice: number;
+  payment?: Payment;
+  fulfilmentChoice: FulfilmentChoice;
+  items: FluentOrderItem[];
+  customer: CreateCustomerInput;
+}
+
+export interface Attributes {
+  name:  string;
+  type:  string;
+  value: string;
+}
+
+export interface CreateCustomerInput {
+  username:       string;
+  attributes?:     Attributes;
+  title?:          string;
+  department:     string;
+  country:        string;
+  firstName:      string;
+  lastName:       string;
+  primaryEmail:   string;
+  primaryPhone:   string;
+  timezone:       string;
+  promotionOptIn: boolean;
+  retailer:       {
+    id: number;
+  };
+}
+
+export interface FulfilmentChoice {
+  currency?:            string;
+  deliveryInstruction?: string;
+  deliveryType:        string;
+  fulfilmentPrice?:     string;
+  fulfilmentTaxPrice?:  string;
+  fulfilmentType?:      string;
+  pickupLocationRef?:   string;
+  deliveryAddress:     DeliveryAddress;
+}
+
+export interface DeliveryAddress {
+  ref:         string;
+  companyName?: string;
+  name:        string;
+  street:      string;
+  city:        string;
+  state:       string;
+  postcode:    string;
+  region?:      string;
+  country:     string;
+  latitude?:    string;
+  longitude?:   string;
+  timeZone?:    string;
+}
+
+export interface FluentOrderItem {
+  ref:                 string;
+  productRef:          string;
+  productCatalogueRef: string;
+  quantity:            number;
+  paidPrice:           number;
+  currency:            string;
+  price:               number;
+  taxPrice:            number;
+  taxType?:            string;
+  totalPrice:          number;
+  totalTaxPrice:       number;
+  attributes?:         Attributes;
+}
+
+export interface Payment {
+  ref: string;
 }

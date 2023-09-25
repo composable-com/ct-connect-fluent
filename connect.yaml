@@ -1,41 +1,4 @@
 deployAs:
-  - name: service
-    applicationType: service
-    endpoint: /service
-    scripts:
-      postDeploy: npm install && npm run build && npm run connector:post-deploy
-      preUndeploy: npm install && npm run build && npm run connector:pre-undeploy
-    configuration:
-      standardConfiguration:
-        - key: CTP_REGION
-          description: commercetools Composable Commerce API region
-      securedConfiguration:
-        - key: CTP_PROJECT_KEY
-          description: commercetools Composable Commerce project key
-        - key: CTP_CLIENT_ID
-          description: commercetools Composable Commerce client ID
-        - key: CTP_CLIENT_SECRET
-          description: commercetools Composable Commerce client secret
-        - key: CTP_SCOPE
-          description: commercetools Composable Commerce client scope
-  - name: job
-    applicationType: job
-    endpoint: /job
-    properties:
-      schedule: "*/5 * * * *"
-    configuration:
-      standardConfiguration:
-        - key: CTP_REGION
-          description: commercetools Composable Commerce API region
-      securedConfiguration:
-        - key: CTP_PROJECT_KEY
-          description: commercetools Composable Commerce project key
-        - key: CTP_CLIENT_ID
-          description: commercetools Composable Commerce client ID
-        - key: CTP_CLIENT_SECRET
-          description: commercetools Composable Commerce client secret
-        - key: CTP_SCOPE
-          description: commercetools Composable Commerce client scope
   - name: event
     applicationType: event
     endpoint: /event
@@ -55,3 +18,19 @@ deployAs:
           description: commercetools Composable Commerce client secret
         - key: CTP_SCOPE
           description: commercetools Composable Commerce client scope
+        - key: FLUENT_CLIENT_ID
+          description: Fluent Retail client ID
+        - key: FLUENT_CLIENT_SECRET
+          description: Fluent Retail client secret
+        - key: FLUENT_USERNAME
+          description: Fluent Retail username
+        - key: FLUENT_PASSWORD
+          description: Fluent Retail password
+        - key: FLUENT_HOST
+          description: Fluent Retail host
+        - key: FLUENT_CATALOGUE_REF
+          description: Fluent Retail catalogue reference
+        - key: FLUENT_RETAILER_ID
+          description: Fluent Retail retailer ID
+        - key: FLUENT_CATALOG_LOCALE
+          description: Locale used in Commercetools in product names, descriptions, etc. (default en-US)
