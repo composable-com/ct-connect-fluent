@@ -57,6 +57,7 @@ let isLogged = false
 export const fluentLogin = async (forceLogin?: boolean) => {
   if (!isLogged || forceLogin) {
     const accessToken = await getAccessToken(CLIENT_ID, CLIENT_SECRET, USERNAME, PASSWORD)
+    console.log('accessToken', accessToken)
     setDefaultHeader(
       'Authorization',
       `${accessToken.token_type} ${accessToken.access_token}`

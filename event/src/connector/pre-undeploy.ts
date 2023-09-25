@@ -17,51 +17,39 @@ import { create } from 'axios';
 //   await deleteCustomerCreateSubscription(apiRoot);
 // }
 
+const FLUENT_CATALOG_LOCALE = process.env.FLUENT_CATALOG_LOCALE ?? 'en-US';
+
 async function run(): Promise<void> {
   try {
     await fluentLogin();
-
-    const { body: { results: ctCategories }} = await createApiRoot()
-      .categories()
-      .get({ queryArgs: { perPage: 500, page: 1 } })
-      .execute();
-
-    const validCTCategories = ctCategories.filter(categories => categories.key);
-
-    const createFluentCategories = validCTCategories
-      .map(async(category) => {
-        const fluentCategory = getFluentCategory(category);
-        fluentCategory && await createCategory(fluentCategory);
-      });
-
-    await Promise.all(createFluentCategories);
     
-    const perPage = 1;
+    const perPage = 50;
     let page = 1;
-    let allProducts: any = [];
+
 
     while (true) {
+      console.log('page ----> ',page);
       const { 
         body: { results, total }
     } = await createApiRoot()
         .products()
-        .get({ queryArgs: { perPage, page } })
+        .get({ queryArgs: { 
+          perPage, 
+          page,
+          offset: (page - 1) * perPage,
+        } })
         .execute();
 
-
-      results.map(async (product) => {
-        const { name, description, categories, masterVariant, variants }  = product.masterData.current
-        
-        const  fluentCategories = getFluentCategoriesFromCTCategories(categories, validCTCategories);
-
+      const productsPromise = results.map(async (product) => {
+        const { name, description, masterVariant, variants }  = product.masterData.current      
         if (!product.key) return;
         
         const productKey = product.key;
         const fluentStandardProduct = getFluentStandardProduct({
-          productName: name['en-US'],
-          productDescription: description?.['en-US'].substring(0, 255), // we need to adjust the length of the description
+          productName: name[FLUENT_CATALOG_LOCALE],
+          productDescription: description?.[FLUENT_CATALOG_LOCALE]?.substring(0, 255) ?? '',
           productKey: productKey,
-          productCategories: fluentCategories
+          productCategories: []
         })
 
         await createStandardProduct(fluentStandardProduct);
@@ -70,26 +58,25 @@ async function run(): Promise<void> {
           .map(variant => 
             getFluentProductVariant({ 
               product: variant, 
-              productName: name['en-US'],
-              productDescription: description?.['en-US'].substring(0, 33),
-              fluentCategories: fluentCategories, 
+              productName: name[FLUENT_CATALOG_LOCALE],
+              productDescription: description?.[FLUENT_CATALOG_LOCALE]?.substring(0, 255) ?? '',
+              fluentCategories: [], 
               fluentStandardProductRef: productKey
             })
           )
-          .map((fluentVariant) => createVariantProduct(fluentVariant));
-
-        const x = await Promise.all(createFluentProductVariants);
-        console.log('x -----> ',x);
+          .map(async (fluentVariant) => await createVariantProduct(fluentVariant));
+        await Promise.all(createFluentProductVariants);
+        console.log('fluentStandardProduct created -----> ', name[FLUENT_CATALOG_LOCALE]);
       });
-      
+      await Promise.all(productsPromise);
+
       if (!total || page >= total) {
         break;
       }
 
       // Wait 5 seconds before making the next request
-      await new Promise((resolve) => setTimeout(resolve, 3000));    
+      await new Promise((resolve) => setTimeout(resolve, 1000));    
       page++;
-      break
     }
   } catch (error) {
     assertError(error);

@@ -3,8 +3,10 @@ import { createApiRoot } from '../client/create.client';
 import CustomError from '../errors/custom.error';
 import { logger } from '../utils/logger.utils';
 import { Category, CreatedBy, MessageDeliveryPayload, Order, ProductProjection } from '@commercetools/platform-sdk';
-import { getFluentCategoriesFromCTCategories, getFluentOrder, getFluentProductVariant, getFluentStandardProduct, getProductFluentCategories } from '../fluent/utils';
-import { createOrder, createStandardProduct, createVariantProduct } from '../fluent/api';
+import { getFluentCategoriesFromCTCategories, getFluentCustomer, getFluentOrder, getFluentProductVariant, getFluentStandardProduct, getFluentTransaction, getProductFluentCategories } from '../fluent/utils';
+import { createFinancialTransaction, createOrder, createOrderAndCustomer, createStandardProduct, createVariantProduct, getCustomerByRef } from '../fluent/api';
+import { get } from 'axios';
+import { fluentLogin } from '../fluent/client';
 
 export interface CtEvent {
   message: {
@@ -20,7 +22,7 @@ export interface CtEvent {
   subscription: string;
 }
 
-export interface CtProductPublishdPayload extends MessageDeliveryPayload {
+export interface CtEventPayload extends MessageDeliveryPayload {
   notificationType: 'Message';
   projectKey: string;
   id: string;
@@ -40,6 +42,8 @@ export interface CtProductPublishdPayload extends MessageDeliveryPayload {
   lastModifiedBy: CreatedBy;
 }
 
+const FLUENT_CATALOG_LOCALE = process.env.FLUENT_CATALOG_LOCALE ?? 'en-US';
+
 /**
  * Exposed event POST endpoint.
  * Receives the Pub/Sub message and works with it
@@ -50,70 +54,115 @@ export interface CtProductPublishdPayload extends MessageDeliveryPayload {
  */
 export const post = async (request: Request, response: Response) => {
   logger.info('Event received');
+  await fluentLogin();
 
   try {
     const event: CtEvent = request.body.data;
-    const payload: CtProductPublishdPayload = JSON.parse(
+    const payload: CtEventPayload = JSON.parse(
       Buffer.from(event.message.data, 'base64').toString()
-    ).data; // .data or not ?? 
+    ).data;
 
-    const { type, productProjection } = payload;
-    console.log(type, JSON.stringify(payload, null, 2))
+    const { type } = payload;
+    console.log('EventType', type)
+    if (type === 'ProductPublished') {
+      const { productProjection } = payload;
+      // We only want to process products with a key
+      if (!productProjection || !productProjection?.key) {
+        logger.error(`Product not processed:  Product does not have a key: ${productProjection?.id}`);
+        return;
+      }
 
-    if (type === 'ProductPublished' && productProjection?.key) {
-      logger.info(`Processing ProductPublished: ${productProjection.key}`);
+      logger.info(`Processing ProductPublished x: ${productProjection.key}`);
 
-      // We get the catalog to get the category name (needed for the fluent category)
-      // if the product has a new category it won't be added in the fluent product
-      // Q:    should we also listen for category changes/creations?
-      //       how important is to have the categories synced ?
-      const { body: { results: ctCategories }} = await createApiRoot()
-        .categories()
-        .get({ queryArgs: { perPage: 500, page: 1 } })
-        .execute();
-      
-      const validCTCategories = ctCategories.filter(categories => categories.key);
-
-      const { name, description, key, categories, variants, masterVariant } = productProjection;
-      const  fluentCategories = getFluentCategoriesFromCTCategories(categories, validCTCategories);
+      const { name, description, key, variants, masterVariant } = productProjection;
 
       const fluentStandardProduct = getFluentStandardProduct({
         productKey: key,
-        productName: name['en-US'],
-        productDescription: description?.['en-US'],
-        productCategories: fluentCategories
+        productName: name[FLUENT_CATALOG_LOCALE],
+        productDescription: description?.[FLUENT_CATALOG_LOCALE],
+        productCategories: []
       });
 
       await createStandardProduct(fluentStandardProduct);
-
+      console.log('fluentStandardProduct -----> ', fluentStandardProduct);
       const createFluentProductVariants = [masterVariant ,...variants]
       .filter(variant => variant.sku)
       .map(variant => 
         getFluentProductVariant({ 
           product: variant, 
-          productName: name['en-US'],
-          productDescription: description?.['en-US'].substring(0, 33),
-          fluentCategories: fluentCategories, 
+          productName: name[FLUENT_CATALOG_LOCALE],
+          productDescription: description?.[FLUENT_CATALOG_LOCALE].substring(0, 255),
+          fluentCategories: [], 
           fluentStandardProductRef: key
         })
       )
       .map((fluentVariant) => createVariantProduct(fluentVariant));
 
       await Promise.all(createFluentProductVariants);
+      
+      logger.info(`Product processed successfully: ${productProjection.key}`);
+      return; 
     }
 
-    const { order } = payload;
-    if (type === 'OrderCreated' && order?.customerEmail) {
+    if (type === 'OrderCreated') {
+      const { order } = payload;
+      if (!order || !order?.customerEmail || !order?.customerId) {
+        logger.info(`Order not processed:  Order does not have customerEmail or customerId: ${order?.id}`);
+        return;
+      }
+
       logger.info(`Processing OrderCreated: ${order.id}`);
 
-      const fluentOrder = getFluentOrder(order);
-      if (fluentOrder) await createOrder(fluentOrder);
-    }
+      let orderId = '';
+      const { data: { customer }} = await getCustomerByRef(order.customerEmail);
+      if (customer) {
+        const fluentOrder = getFluentOrder(order, Number(customer.id));
+        const { data: { createOrder: { id: fluentOrderId } } } = await createOrder({ 
+          input: fluentOrder 
+        });
+        logger.info(`Order created in fluent: ${fluentOrderId}`);
+        orderId = fluentOrderId;
+      } else {
+        logger.info(`Customer not found in fluent: ${order.customerEmail}`);
+        const { body: ctCustomer }= await createApiRoot()
+          .customers()
+          .withId({ ID: order.customerId })
+          .get()
+          .execute()
 
+        const fluentCustomer = getFluentCustomer(ctCustomer);
+        const fluentOrder = getFluentOrder(order);
+
+        const { data: { createOrderAndCustomer: { id: fluentOrderId } }} = await createOrderAndCustomer({ 
+          input: {
+            ...fluentOrder,
+            customer: {
+              ...fluentCustomer,
+            }
+          } 
+        });
+        orderId = fluentOrderId;
+      }
+
+      if (order.paymentInfo?.payments?.length) {
+        const { body: ctPaymentDetails } = await createApiRoot()
+        .payments()
+        .withId({ ID: order?.paymentInfo?.payments[0].id })
+        .get()
+        .execute();
+
+        const fluentTransaction = getFluentTransaction(ctPaymentDetails, Number(orderId));
+
+        await createFinancialTransaction({ input: fluentTransaction });
+      }
+      
+      return;
+    }
+    response.status(204).send();
   } catch (error) {
+    console.log('error', error)
     logger.info(`Event message error: ${(error as Error).message}`);
     response.status(400);
     response.send();
   }
-  response.status(204).send();
 };
