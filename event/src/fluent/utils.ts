@@ -6,6 +6,7 @@ import { TypedMoney } from '@commercetools/platform-sdk';
 const FLUENT_CATALOGUE_REF = process.env.FLUENT_CATALOGUE_REF ?? '';
 const FLUENT_RETAILER_ID = process.env.FLUENT_RETAILER_ID ?? '';
 const FLUENT_CATALOG_LOCALE = process.env.FLUENT_CATALOG_LOCALE ?? 'en-US';
+
 export const getFluentStandardProduct = (params: {
   productName: string
   productCategories?: string[],
