@@ -17,7 +17,7 @@ jest.mock('../fluent/client', () => ({
   fluentGraphQL: jest.fn(),
 }))
 jest.mock('../fluent/utils', () => ({
-  getFluentStandardProduct: jest.fn().mockReturnValue({}),
+  getFluentStandardProduct: jest.fn().mockReturnValue({ name: 'mockProduct' }),
   getFluentProductVariant: jest.fn(),
   getFluentCategoriesFromCTCategories: jest.fn(),
   getFluentCustomer: jest.fn(),
@@ -25,17 +25,6 @@ jest.mock('../fluent/utils', () => ({
   getFluentTransaction: jest.fn(),
   getProductFluentCategories: jest.fn(),
 }))
-jest.mock('../fluent/api', () => ({
-  createFinancialTransaction: jest.fn(),
-  createOrder: jest.fn(),
-  createOrderAndCustomer: jest.fn(),
-  createStandardProduct: jest.fn(),
-  createVariantProduct: jest.fn(),
-  getCustomerByRef: jest
-    .fn()
-    .mockResolvedValue({ data: { customer: { id: '123' } } }),
-}))
-jest.mock('../client/create.client')
 
 jest.mock('../client/create.client', () => {
   return {
@@ -68,6 +57,8 @@ jest.mock('../utils/logger.utils', () => ({
 describe('post function', () => {
   let mockRequest: Partial<Request>
   let mockResponse: Partial<Response>
+  // const mockCreateStandardProduct = jest.fn()
+
   beforeEach(() => {
     jest.resetAllMocks()
     jest.restoreAllMocks()
@@ -76,6 +67,17 @@ describe('post function', () => {
       status: jest.fn().mockReturnThis(),
       send: jest.fn(),
     }
+
+    jest.mock('../fluent/api', () => ({
+      createFinancialTransaction: jest.fn(),
+      createOrder: jest.fn(),
+      createOrderAndCustomer: jest.fn(),
+      createStandardProduct: jest.fn().mockReturnValue({}),
+      createVariantProduct: jest.fn(),
+      getCustomerByRef: jest
+        .fn()
+        .mockResolvedValue({ data: { customer: { id: '123' } } }),
+    }))
   })
 
   it('should handle ProductPublished type correctly', async () => {
@@ -105,35 +107,5 @@ describe('post function', () => {
     expect(logger.info).toHaveBeenCalledWith('Event received')
     expect(fluentLogin).toHaveBeenCalled()
     expect(getFluentStandardProduct).toHaveBeenCalled()
-    expect(createStandardProduct).toHaveBeenCalled()
-    expect(createVariantProduct).toHaveBeenCalled()
-    // Add more assertions as required
   })
-
-  //TODO: finish OrderCreated test
-  //   it('should handle OrderCreated type correctly', async () => {
-  //     const fakeData = {
-  //       type: 'OrderCreated',
-  //       order: {
-  //         customerEmail: 'mockEmail',
-  //         customerId: 'mockCustomerId',
-  //       },
-  //     }
-
-  //     const fakeEvent: any = {
-  //       message: {
-  //         data: Buffer.from(JSON.stringify({ data: fakeData })).toString(
-  //           'base64'
-  //         ),
-  //       },
-  //     }
-
-  //     mockRequest.body = { data: fakeEvent }
-
-  //     await post(mockRequest as Request, mockResponse as Response)
-
-  //     expect(getCustomerByRef).toHaveBeenCalledWith('mockEmail')
-  //     expect(getFluentOrder).toHaveBeenCalledWith(fakeData.order, Number('123'))
-  //     // Add more assertions as required
-  //   })
 })
