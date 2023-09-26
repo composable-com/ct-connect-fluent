@@ -51,13 +51,13 @@ This will trigger the [`preUndeploy` script](https://docs.commercetools.com/conn
 
 ### Processing Product Changes and first sync
 
-When the connector is getting deployed, it will get all your commercetools products and create them in FluentCommerce. We currently don't support Product Categories.
+When the connector is getting deployed, it will get all your commercetools products and create them in FluentCommerce. This connector does not sync product category data.
 
 When a product is published on commercetools, an event of type 'ProductPublished' is received. The application checks if this product has a key. If there isn't one, the product is not processed. 
 
 If a product key exists, the application proceeds to create or update a 'standard product' and its 'variants' in FluentCommerce. 
 
-If a product key exists, but the variant has an SKU equals to that key, we won't process the product. This is because standard products should have a unique Ref in FluentCommerce, and SKU will be used for Ref in variants.
+If a product key exists, but the variant has an SKU equals to that key, the connector will not process the product. This is because standard products should have a unique Ref in FluentCommerce, and SKU will be used for Ref in variants.
 
 The standard product, which represents the main product, includes details like the product name, description. The variants represent different forms of the product, like different sizes or colors and include similar information as the standard product, along with their SKU (Stock Keeping Unit).
 
