@@ -82,7 +82,7 @@ export const getFluentProductVariant = (params: {
       "type": "VARIANT",
       "status": "ACTIVE",
       "gtin": "D45", // The Variant Product is D45 it has to be present in order to display the product in fluent
-      "name": productName, // From CT I only have the SKU, what should I use here?
+      "name": productName,
       "summary": productDescription?.substring(0, 255) ?? '',
       "standardProductRef": fluentStandardProductRef,
       "attributes": [

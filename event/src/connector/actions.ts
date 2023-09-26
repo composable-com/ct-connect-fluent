@@ -1,6 +1,6 @@
-import { ByProjectKeyRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder';
+import { ByProjectKeyRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder'
 
-const MY_SUBSCRIPTION_KEY = 'ct-connect-fluent-subscription';
+export const MY_SUBSCRIPTION_KEY = 'ct-connect-fluent-subscription'
 
 export async function createMySubscription(
   apiRoot: ByProjectKeyRequestBuilder,
@@ -16,10 +16,10 @@ export async function createMySubscription(
         where: `key = "${MY_SUBSCRIPTION_KEY}"`,
       },
     })
-    .execute();
+    .execute()
 
   if (subscriptions.length > 0) {
-    const subscription = subscriptions[0];
+    const subscription = subscriptions[0]
 
     await apiRoot
       .subscriptions()
@@ -29,7 +29,7 @@ export async function createMySubscription(
           version: subscription.version,
         },
       })
-      .execute();
+      .execute()
   }
 
   await apiRoot
@@ -54,11 +54,11 @@ export async function createMySubscription(
           {
             resourceTypeId: 'order',
             types: ['OrderCreated'],
-          }
+          },
         ],
       },
     })
-    .execute();
+    .execute()
 }
 
 export async function deleteMySubscription(
@@ -73,10 +73,10 @@ export async function deleteMySubscription(
         where: `key = "${MY_SUBSCRIPTION_KEY}"`,
       },
     })
-    .execute();
+    .execute()
 
   if (subscriptions.length > 0) {
-    const subscription = subscriptions[0];
+    const subscription = subscriptions[0]
 
     await apiRoot
       .subscriptions()
@@ -86,6 +86,6 @@ export async function deleteMySubscription(
           version: subscription.version,
         },
       })
-      .execute();
+      .execute()
   }
 }

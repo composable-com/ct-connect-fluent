@@ -9,14 +9,14 @@ import { getFluentProductVariant, getFluentStandardProduct } from '../fluent/uti
 import { createStandardProduct, createVariantProduct } from '../fluent/api';
 import { logger } from '../utils/logger.utils';
 
-async function preUndeploy(): Promise<void> {
+export async function preUndeploy(): Promise<void> {
   const apiRoot = createApiRoot();
   await deleteMySubscription(apiRoot);
 }
 
 const FLUENT_CATALOG_LOCALE = process.env.FLUENT_CATALOG_LOCALE ?? 'en-US';
 
-async function run(): Promise<void> {
+export async function run(): Promise<void> {
   await preUndeploy();
 
   try {
