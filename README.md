@@ -1,4 +1,9 @@
-# commercetools FluentCommerce Connector
+# commercetools Fluent Commerce Connector
+
+The Fluent Commerce commercetools connector was created by [Orium](https://orium.com/), and provides the following features:
+- Ability to capture customer order events from commercetools to Fluent, including payment transaction details
+- Ability to initially load all products from commercetools to Fluent Commerce when the connector is installed
+- Ability to continuously synchronize products from commercetools to Fluent Commerce in near real-time
 
 ## Overview
 
