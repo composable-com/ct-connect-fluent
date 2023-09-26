@@ -1,9 +1,6 @@
 import axios from 'axios';
 import { fluentLogin, fluentGraphQL } from './client'; // Import the functions you want to test
 
-// Mock axios.post to avoid actual HTTP requests
-jest.mock('axios');
-
 describe('Fluent Client', () => {
   beforeEach(() => {
     jest.clearAllMocks();
