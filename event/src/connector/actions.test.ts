@@ -1,11 +1,11 @@
 import { ByProjectKeyRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder'
 import {
-  PRODUCT_PUBLISHED_SUBSCRIPTION_KEY,
-  createProductPublishedSubscription,
-  deleteProductPublishedSubscription,
+  MY_SUBSCRIPTION_KEY,
+  createMySubscription,
+  deleteMySubscription,
 } from './actions'
 
-describe('createProductPublishedSubscription', () => {
+describe('createMySubscription', () => {
   let mockDeletefn: typeof jest.fn
   let mockPostfn: typeof jest.fn
   let mockApiRoot: ByProjectKeyRequestBuilder
@@ -30,51 +30,59 @@ describe('createProductPublishedSubscription', () => {
   })
 
   it('should delete an existing subscription if one exists', async () => {
-    await createProductPublishedSubscription(
-      mockApiRoot,
-      'topicName',
-      'projectId'
-    )
+    await createMySubscription(mockApiRoot, 'topicName', 'projectId')
 
     expect(mockDeletefn).toHaveBeenCalledWith({
       queryArgs: { version: 1 },
     })
     expect(mockPostfn).toHaveBeenCalledWith({
       body: {
-        key: PRODUCT_PUBLISHED_SUBSCRIPTION_KEY,
+        key: MY_SUBSCRIPTION_KEY,
         destination: {
           projectId: 'projectId',
           topic: 'topicName',
           type: 'GoogleCloudPubSub',
+        },
+        format: {
+          type: 'CloudEvents',
+          cloudEventsVersion: '1.0',
         },
         messages: [
           {
             resourceTypeId: 'product',
             types: ['ProductPublished'],
           },
+          {
+            resourceTypeId: 'order',
+            types: ['OrderCreated'],
+          },
         ],
       },
     })
   })
   it('should POST with expected body', async () => {
-    await createProductPublishedSubscription(
-      mockApiRoot,
-      'topicName',
-      'projectId'
-    )
+    await createMySubscription(mockApiRoot, 'topicName', 'projectId')
 
     expect(mockPostfn).toHaveBeenCalledWith({
       body: {
-        key: PRODUCT_PUBLISHED_SUBSCRIPTION_KEY,
+        key: MY_SUBSCRIPTION_KEY,
         destination: {
           projectId: 'projectId',
           topic: 'topicName',
           type: 'GoogleCloudPubSub',
         },
+        format: {
+          type: 'CloudEvents',
+          cloudEventsVersion: '1.0',
+        },
         messages: [
           {
             resourceTypeId: 'product',
             types: ['ProductPublished'],
+          },
+          {
+            resourceTypeId: 'order',
+            types: ['OrderCreated'],
           },
         ],
       },
@@ -82,7 +90,7 @@ describe('createProductPublishedSubscription', () => {
   })
 })
 
-describe('deleteProductPublishedSubscription', () => {
+describe('deleteMySubscription', () => {
   let mockDeletefn: typeof jest.fn
   let mockApiRoot: ByProjectKeyRequestBuilder
 
@@ -104,7 +112,7 @@ describe('deleteProductPublishedSubscription', () => {
   })
 
   it('should delete a subscription', async () => {
-    await deleteProductPublishedSubscription(mockApiRoot)
+    await deleteMySubscription(mockApiRoot)
 
     expect(mockDeletefn).toHaveBeenCalledWith({
       queryArgs: { version: 1 },

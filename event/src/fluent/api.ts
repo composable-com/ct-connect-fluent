@@ -20,7 +20,6 @@ export const createOrderAndCustomer = async (order: GraphQlInput<CreateOrderAndC
     mutation createOrderAndCustomer ($input: CreateOrderAndCustomerInput) {
       createOrderAndCustomer (input: $input) {
           id
-          createOn
       }
     }
   `
@@ -28,7 +27,7 @@ export const createOrderAndCustomer = async (order: GraphQlInput<CreateOrderAndC
     ...order,
   }
 
-  const response = await fluentGraphQL<{ data: { createOrderAndCustomer: { id: string, createOn: Date } } }>({
+  const response = await fluentGraphQL<{ data: { createOrderAndCustomer: { id: string } } }>({
     query: CREATE_ORDER_AND_CUSTOMER_MUTATION,
     variables
   });
@@ -39,9 +38,8 @@ export const createOrderAndCustomer = async (order: GraphQlInput<CreateOrderAndC
 export const createOrder = async (order: GraphQlInput<CreateOrderInput>) => {
   const CREATE_ORDER_MUTATION = `
     mutation CreateOrder($input: CreateOrderInput!) {
-      createOrder(input: $input) {
+      createOrder (input: $input) {
         id
-        createdOn
       }
     }
   `;
@@ -50,7 +48,7 @@ export const createOrder = async (order: GraphQlInput<CreateOrderInput>) => {
     ...order,
   }
 
-  const response = await fluentGraphQL<{ data: { createOrder: { id: string, createOn: Date } } }>({ 
+  const response = await fluentGraphQL<{ data: { createOrder: { id: string } } }>({ 
     query: CREATE_ORDER_MUTATION, 
     variables 
   })
