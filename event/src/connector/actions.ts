@@ -1,7 +1,7 @@
-import { ByProjectKeyRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder';
+import { ByProjectKeyRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder'
 
-const PRODUCT_PUBLISHED_SUBSCRIPTION_KEY =
-  'myconnector-productPublishedSubscription';
+export const PRODUCT_PUBLISHED_SUBSCRIPTION_KEY =
+  'myconnector-productPublishedSubscription'
 
 export async function createProductPublishedSubscription(
   apiRoot: ByProjectKeyRequestBuilder,
@@ -17,10 +17,10 @@ export async function createProductPublishedSubscription(
         where: `key = "${PRODUCT_PUBLISHED_SUBSCRIPTION_KEY}"`,
       },
     })
-    .execute();
+    .execute()
 
   if (subscriptions.length > 0) {
-    const subscription = subscriptions[0];
+    const subscription = subscriptions[0]
 
     await apiRoot
       .subscriptions()
@@ -30,7 +30,7 @@ export async function createProductPublishedSubscription(
           version: subscription.version,
         },
       })
-      .execute();
+      .execute()
   }
 
   await apiRoot
@@ -51,7 +51,7 @@ export async function createProductPublishedSubscription(
         ],
       },
     })
-    .execute();
+    .execute()
 }
 
 export async function deleteProductPublishedSubscription(
@@ -66,10 +66,10 @@ export async function deleteProductPublishedSubscription(
         where: `key = "${PRODUCT_PUBLISHED_SUBSCRIPTION_KEY}"`,
       },
     })
-    .execute();
+    .execute()
 
   if (subscriptions.length > 0) {
-    const subscription = subscriptions[0];
+    const subscription = subscriptions[0]
 
     await apiRoot
       .subscriptions()
@@ -79,6 +79,6 @@ export async function deleteProductPublishedSubscription(
           version: subscription.version,
         },
       })
-      .execute();
+      .execute()
   }
 }
