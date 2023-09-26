@@ -72,3 +72,8 @@ If there are payments associated with the order, a financial transaction is crea
 
 
 
+## Useful links
+- https://lingo.fluentcommerce.com/asset-library/reference-modules/order/
+- https://lingo.fluentcommerce.com/overview/getting-started/glossary/
+- https://lingo.fluentcommerce.com/apis/graphql/
+- https://lingo.fluentcommerce.com/apis/rest/v4.1/event-api/
