@@ -50,7 +50,7 @@ jest.mock('../utils/logger.utils', () => {
 
 describe('pre-undeploy', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
     jest.restoreAllMocks()
   })
   it('should delete subscription', async () => {
@@ -62,7 +62,7 @@ describe('pre-undeploy', () => {
 
 describe('run', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
     jest.restoreAllMocks()
   })
   it('should delete subscription', async () => {

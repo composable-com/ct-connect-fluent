@@ -20,7 +20,8 @@ jest.spyOn(actions, 'createMySubscription').mockReturnValue(Promise.resolve())
 
 describe('run function', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
+    jest.restoreAllMocks()
   })
 
   it('should call postDeploy and handle errors gracefully', async () => {

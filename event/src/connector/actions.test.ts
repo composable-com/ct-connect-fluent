@@ -17,6 +17,9 @@ describe('createMySubscription', () => {
   }
 
   beforeEach(() => {
+    jest.resetAllMocks()
+    jest.restoreAllMocks()
+
     mockDeletefn = jest.fn().mockReturnThis()
     mockPostfn = jest.fn().mockReturnThis()
     mockApiRoot = {
@@ -101,6 +104,8 @@ describe('deleteMySubscription', () => {
   }
 
   beforeEach(() => {
+    jest.resetAllMocks()
+    jest.restoreAllMocks()
     mockDeletefn = jest.fn().mockReturnThis()
     mockApiRoot = {
       subscriptions: jest.fn().mockReturnThis(),

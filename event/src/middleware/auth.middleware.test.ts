@@ -1,4 +1,4 @@
-import { authMiddlewareOptions } from './auth.middleware';
+import { authMiddlewareOptions } from './auth.middleware'
 
 const mockConfiguration = {
   region: 'test-region',
@@ -6,7 +6,7 @@ const mockConfiguration = {
   clientId: 'test-client-id',
   clientSecret: 'test-client-secret',
   scope: undefined,
-};
+}
 
 jest.mock('../utils/config.utils', () => ({
   readConfiguration: jest.fn().mockReturnValue({
@@ -16,12 +16,13 @@ jest.mock('../utils/config.utils', () => ({
     clientSecret: 'test-client-secret',
     scope: undefined,
   }),
-}));
+}))
 
 describe('authMiddlewareOptions configuration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-  });
+    jest.resetAllMocks()
+    jest.restoreAllMocks()
+  })
 
   it('should use default scope when scope is not provided in configuration', () => {
     const expectedAuthMiddlewareOptions = {
@@ -32,8 +33,8 @@ describe('authMiddlewareOptions configuration', () => {
         clientSecret: mockConfiguration.clientSecret,
       },
       scopes: ['default'],
-    };
+    }
 
-    expect(authMiddlewareOptions).toEqual(expectedAuthMiddlewareOptions);
-  });
-});
+    expect(authMiddlewareOptions).toEqual(expectedAuthMiddlewareOptions)
+  })
+})
