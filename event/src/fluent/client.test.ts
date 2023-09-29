@@ -1,24 +1,26 @@
-import axios from 'axios';
-import { fluentLogin, fluentGraphQL } from './client'; // Import the functions you want to test
+import axios from 'axios'
+import { fluentGraphQL, fluentLogin } from './client'
+
+jest.mock('axios')
+const mockedAxios = axios as jest.Mocked<typeof axios>
 
 describe('Fluent Client', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-  });
+    jest.restoreAllMocks()
+  })
 
   it('should log in and set headers', async () => {
     const mockAccessToken = {
       token_type: 'Bearer',
       access_token: 'mockedAccessToken',
       expires_in: 3600,
-    };
+    }
 
-    // Mock axios.post to return a mock access token
-    (axios.post as jest.Mock).mockResolvedValue({ data: mockAccessToken });
+    mockedAxios.post.mockResolvedValue({ data: mockAccessToken })
 
-    await fluentLogin();
+    await fluentLogin()
 
-    expect(axios.post).toHaveBeenCalledWith(
+    expect(mockedAxios.post).toHaveBeenCalledWith(
       expect.stringContaining('/oauth/token'),
       {},
       {
@@ -31,82 +33,62 @@ describe('Fluent Client', () => {
           scope: 'api',
         },
       }
-    );
+    )
     expect(axios.defaults.headers.common['Authorization']).toBe(
       'Bearer mockedAccessToken'
-    );
-  });
+    )
+  })
 
   it('should make a GraphQL request', async () => {
-    const mockResponseData = { data: 'mockedData' };
+    const mockResponseData = { data: 'mockedData' }
 
     // Mock axios.post to return a mock response
-    (axios.post as jest.Mock).mockResolvedValue({ data: mockResponseData });
-
-    const result = await fluentGraphQL({ query: 'query' });
+    mockedAxios.post.mockResolvedValue({ data: mockResponseData })
+    const result = await fluentGraphQL({ query: 'query' })
 
     expect(axios.post).toHaveBeenCalledWith(
       expect.stringContaining('/graphql'),
       { query: 'query', variables: undefined },
       { headers: expect.any(Object) }
-    );
-    expect(result).toEqual(mockResponseData);
-  });
+    )
+    expect(result).toEqual(mockResponseData)
+  })
 
   it('should handle login error', async () => {
     // Mock axios.post to simulate an error response
-    (axios.post as jest.Mock).mockRejectedValue(new Error('Login failed'));
+    mockedAxios.post.mockRejectedValue(new Error('Login failed'))
 
     try {
-      await fluentLogin();
+      await fluentLogin()
     } catch (error) {
-      expect(error).toEqual(new Error('Login failed'));
-      expect(axios.defaults.headers.common['Authorization']).toBeUndefined();
-      expect(axios.defaults.headers.common['ExpiredAt']).toBeUndefined();
+      expect(error).toEqual(new Error('Login failed'))
+      expect(axios.defaults.headers.common['Authorization']).toBeUndefined()
+      expect(axios.defaults.headers.common['ExpiredAt']).toBeUndefined()
     }
-  });
-
-
-  ///
-
-  it('should handle login error', async () => {
-    // Mock axios.post to simulate an error response
-    (axios.post as jest.Mock).mockRejectedValue(new Error('Login failed'));
-
-    try {
-      await fluentLogin();
-    } catch (error) {
-      expect(error).toEqual(new Error('Login failed'));
-      expect(axios.defaults.headers.common['Authorization']).toBeUndefined();
-      expect(axios.defaults.headers.common['ExpiredAt']).toBeUndefined();
-    }
-  });
+  })
 
   it('should handle GraphQL request error', async () => {
     // Mock axios.post to simulate an error response
-    (axios.post as jest.Mock).mockRejectedValue(new Error('GraphQL request failed'));
+    mockedAxios.post.mockRejectedValue(new Error('GraphQL request failed'))
 
     try {
-      await fluentGraphQL({ query: 'query' });
+      await fluentGraphQL({ query: 'query' })
     } catch (error) {
-      expect(error).toEqual(new Error('GraphQL request failed'));
+      expect(error).toEqual(new Error('GraphQL request failed'))
     }
-  });
+  })
 
   // Test when environment variables are not set (e.g., process.env.FLUENT_CLIENT_ID is empty)
   it('should handle missing environment variables', async () => {
-    const originalEnv = process.env;
-    process.env = {}; // Empty environment variables
+    const originalEnv = process.env
+    process.env = {} // Empty environment variables
 
     try {
-      await fluentLogin();
-      // Add more tests for other functions as needed
-
+      await fluentLogin()
     } catch (error) {
-      expect(error).toEqual(new Error('Missing environment variable(s)'));
+      expect(error).toEqual(new Error('Missing environment variable(s)'))
     } finally {
-      process.env = originalEnv; // Restore original environment variables
+      process.env = originalEnv // Restore original environment variables
     }
-  });
-
-});
+  })
+})
