@@ -8,9 +8,11 @@ import {
   createCartUpdateExtension,
 } from './actions';
 
-const CONNECT_APPLICATION_URL_KEY = 'CONNECT_SERVICE_URL';
+export const CONNECT_APPLICATION_URL_KEY = 'CONNECT_SERVICE_URL';
 
-async function postDeploy(properties: Map<string, unknown>): Promise<void> {
+export async function postDeploy(
+  properties: Map<string, unknown>
+): Promise<void> {
   const applicationUrl = properties.get(CONNECT_APPLICATION_URL_KEY);
 
   assertString(applicationUrl, CONNECT_APPLICATION_URL_KEY);
@@ -20,7 +22,7 @@ async function postDeploy(properties: Map<string, unknown>): Promise<void> {
   await createCustomCartDiscountType(apiRoot);
 }
 
-async function run(): Promise<void> {
+export async function run(): Promise<void> {
   try {
     const properties = new Map(Object.entries(process.env));
     await postDeploy(properties);
