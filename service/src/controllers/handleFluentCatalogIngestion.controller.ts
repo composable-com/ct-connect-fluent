@@ -10,13 +10,14 @@ export async function getHandleFluentCatalogIngestion(
     req,
     res,
     handler: async () => {
-      fluentCatalogIngestion();
-      
-      res.contentType('application/javascript');
-      res.status(200);
-      res.send({
-        success: true,
-      });
+     await controllerHandler(res);
     },
   });
+}
+
+export async function controllerHandler(res: Response) {
+  fluentCatalogIngestion();
+  res.contentType('application/javascript');
+  res.status(200);
+  res.send({ success: true });
 }

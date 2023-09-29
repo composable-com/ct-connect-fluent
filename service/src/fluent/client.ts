@@ -88,7 +88,7 @@ export const fluentGraphQL = async <T = any>({ query, variables }: GraphQLReques
   return response.data
 }
 
-FluentClient.interceptors.request.use(async (request) => {
+FluentClient?.interceptors.request.use(async (request) => {
   const commonHeaders = request.headers
     ?.common as unknown as CommonHeaderProperties
   const expiresAt = Number(commonHeaders?.['ExpiredAt'] ?? -1)

@@ -32,7 +32,7 @@ jest.mock('./client', () => ({
 
 describe('createCategory', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
     jest.restoreAllMocks()
   })
 

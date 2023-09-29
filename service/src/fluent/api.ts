@@ -13,7 +13,7 @@ export const createStandardProduct = (product: FluentStandardProduct) => {
 
 export const createVariantProduct = (product: FluentVariantProduct) => {
   return FluentClient.post(`${FLUENT_HOST}/api/v4.1/event/async`, product);
-};
+}
 
 export const createOrderAndCustomer = async (order: GraphQlInput<CreateOrderAndCustomerInput>) => {
   const CREATE_ORDER_AND_CUSTOMER_MUTATION = `
