@@ -12,7 +12,6 @@ export async function basicAuthHandler(params: {
     { username: projectKey, password: basicAuthSecret },
   ];
 
-  console.log(allowedCredentials)
   const authHeader = req.headers.authorization;
 
   if (authHeader) {
@@ -20,13 +19,11 @@ export async function basicAuthHandler(params: {
     const decodedCredentials = Buffer.from(credentials, 'base64').toString(
       'utf-8'
     );
-    console.log('decodedCredentials', decodedCredentials);
     const [username, password] = decodedCredentials.split(':');
 
     const isValidCredentials = allowedCredentials.some(
       (cred) => cred.username === username && cred.password === password
     );
-
 
     if (isValidCredentials) {
       try {

@@ -17,7 +17,7 @@ serviceRouter.post('/', async (req, res) => {
     !name || name !== fluentWebHookName || 
     fluentRetailerId !== Number(retailerId)
   ) {
-    console.log('Invalid request', name, fluentWebHookName, retailerId, fluentRetailerId);
+    logger.info('Invalid request', name, fluentWebHookName, retailerId, fluentRetailerId);
     return res.status(400).send({ error: 'Invalid request' });
   }
 
