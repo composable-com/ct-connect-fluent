@@ -1,9 +1,15 @@
 import axios from 'axios';
-import { fluentLogin, fluentGraphQL } from './client'; // Import the functions you want to test
+import { fluentGraphQL, fluentLogin } from './client';
+
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedInterceptor = jest.fn();
+
+mockedAxios.interceptors.request.use(mockedInterceptor);
 
 describe('Fluent Client', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   it('should log in and set headers', async () => {
@@ -13,12 +19,11 @@ describe('Fluent Client', () => {
       expires_in: 3600,
     };
 
-    // Mock axios.post to return a mock access token
-    (axios.post as jest.Mock).mockResolvedValue({ data: mockAccessToken });
+    mockedAxios.post.mockResolvedValue({ data: mockAccessToken });
 
     await fluentLogin();
 
-    expect(axios.post).toHaveBeenCalledWith(
+    expect(mockedAxios.post).toHaveBeenCalledWith(
       expect.stringContaining('/oauth/token'),
       {},
       {
@@ -41,8 +46,7 @@ describe('Fluent Client', () => {
     const mockResponseData = { data: 'mockedData' };
 
     // Mock axios.post to return a mock response
-    (axios.post as jest.Mock).mockResolvedValue({ data: mockResponseData });
-
+    mockedAxios.post.mockResolvedValue({ data: mockResponseData });
     const result = await fluentGraphQL({ query: 'query' });
 
     expect(axios.post).toHaveBeenCalledWith(
@@ -55,23 +59,7 @@ describe('Fluent Client', () => {
 
   it('should handle login error', async () => {
     // Mock axios.post to simulate an error response
-    (axios.post as jest.Mock).mockRejectedValue(new Error('Login failed'));
-
-    try {
-      await fluentLogin();
-    } catch (error) {
-      expect(error).toEqual(new Error('Login failed'));
-      expect(axios.defaults.headers.common['Authorization']).toBeUndefined();
-      expect(axios.defaults.headers.common['ExpiredAt']).toBeUndefined();
-    }
-  });
-
-
-  ///
-
-  it('should handle login error', async () => {
-    // Mock axios.post to simulate an error response
-    (axios.post as jest.Mock).mockRejectedValue(new Error('Login failed'));
+    mockedAxios.post.mockRejectedValue(new Error('Login failed'));
 
     try {
       await fluentLogin();
@@ -84,7 +72,7 @@ describe('Fluent Client', () => {
 
   it('should handle GraphQL request error', async () => {
     // Mock axios.post to simulate an error response
-    (axios.post as jest.Mock).mockRejectedValue(new Error('GraphQL request failed'));
+    mockedAxios.post.mockRejectedValue(new Error('GraphQL request failed'));
 
     try {
       await fluentGraphQL({ query: 'query' });
@@ -100,13 +88,10 @@ describe('Fluent Client', () => {
 
     try {
       await fluentLogin();
-      // Add more tests for other functions as needed
-
     } catch (error) {
       expect(error).toEqual(new Error('Missing environment variable(s)'));
     } finally {
       process.env = originalEnv; // Restore original environment variables
     }
   });
-
 });
