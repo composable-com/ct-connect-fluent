@@ -1,11 +1,9 @@
 import { Request, Response } from 'express';
 import { createApiRoot } from '../client/create.client';
-import CustomError from '../errors/custom.error';
 import { logger } from '../utils/logger.utils';
-import { Category, CreatedBy, MessageDeliveryPayload, Order, ProductProjection } from '@commercetools/platform-sdk';
-import { getFluentCategoriesFromCTCategories, getFluentCustomer, getFluentOrder, getFluentProductVariant, getFluentStandardProduct, getFluentTransaction, getProductFluentCategories } from '../fluent/utils';
+import { CreatedBy, MessageDeliveryPayload, Order, ProductProjection } from '@commercetools/platform-sdk';
+import { getFluentCustomer, getFluentOrder, getFluentProductVariant, getFluentStandardProduct, getFluentTransaction, getProductFluentCategories } from '../fluent/utils';
 import { createFinancialTransaction, createOrder, createOrderAndCustomer, createStandardProduct, createVariantProduct, getCustomerByRef } from '../fluent/api';
-import { get } from 'axios';
 import { fluentLogin } from '../fluent/client';
 
 export interface CtEvent {

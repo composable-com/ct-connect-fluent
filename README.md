@@ -35,6 +35,8 @@ Setup the required environment variables when you [create the deployment](https:
 - `FLUENT_CATALOGUE_REF`
 - `FLUENT_RETAILER_ID`
 - `FLUENT_CATALOG_LOCALE`
+- `FLUENT_WEBHOOK_NAME`
+- `BASIC_AUTH_SECRET`
 
 Once the connector is deployed, it should trigger the [`postDeploy` script](https://docs.commercetools.com/connect/convert-existing-integration#postdeploy).
 
@@ -46,12 +48,39 @@ In order to uninstall the connector, you’ll need to [send the appropriate HTTP
 
 This will trigger the [`preUndeploy` script](https://docs.commercetools.com/connect/convert-existing-integration#preundeploy) which will delete the messages subscriptions described on the “Installing the connector” section.
 
+### Post Deploy Steps (recommended)
+
+During installation this connector sets up subscription listen for any product publish and updates or insert the product on Fluent. However, after installation, we recommend triggering a manual first time sync in order to have your data imported into Fluent as soon as possible. Follow the steps below to trigger the first product sync.
+
+1 - Execute a GET request to retrieve your Service URL:
+
+```bash
+curl --get https://connect.us-central1.gcp.commercetools.com/{{ CTP_CLIENT_ID }}/deployments/key={{ COMMERCETOOLS_DEPLOYMENT_KEY }} \
+--header 'Authorization: Bearer {{ access_token }}' | json_pp | grep https://
+```
+
+> _Replace `{{ CTP_CLIENT_ID }}` and `{{ COMMERCETOOLS_DEPLOYMENT_KEY }}` with the values used when creating the deployment._
+>
+> _[How to get the {{ access_token }}?](https://docs.commercetools.com/api/authorization#client-credentials-flow)_
+
+The url will look like this `https://service-2da6408a-5e4e-493e-a413-c248f2c37174.us-central1.gcp.preview.commercetools.app/service`
+
+2 - After retrieving the Service URL, send a GET request to trigger the products sync.
+
+```bash
+curl -u {{ CTP_PROJECT_KEY }}:{{ BASIC_AUTH_SECRET }} \
+https://service-2da6408a-5e4e-493e-a413-c248f2c37174.us-central1.gcp.preview.commercetools.app/service/bloomreach-discovery-catalog-ingestion
+```
+
+> _Replace `{{ CTP_PROJECT_KEY }}` and `{{ BASIC_AUTH_SECRET }}` with the values you used when creating the deployment._
+> 
+> _Replace `https://service-2da6408a-5e4e-493e-a413-c248f2c37174.us-central1.gcp.preview.commercetools.app/service` with the service url you got in the previous step._
+
+
 ## How it works
 
 
-### Processing Product Changes and first sync
-
-When the connector is getting deployed, it will get all your commercetools products and create them in FluentCommerce. This connector does not sync product category data.
+### Processing Product Changes
 
 When a product is published on commercetools, an event of type 'ProductPublished' is received. The application checks if this product has a key. If there isn't one, the product is not processed. 
 
@@ -69,13 +98,20 @@ If they do, the application proceeds to create an order in FluentCommerce. If th
 
 If there are payments associated with the order, a financial transaction is created in FluentCommerce.
 
+### Processing Order Complete Update
+
+When an order is updated on Fluent, an WebHook will be triggered and the connector will update the order on commercetools. You will have to configure out the workflow on Fluent to trigger the WebHook when an order is COMPLETED. You should set the `FLUENT_WEBHOOK_NAME` env variable with the name of the WebHook you created on Fluent.
+
+
 ## FAQ
 
 ### Why do we need the `FLUENT_CATALOG_LOCALE` env variable?
 
 - By default, commercetools has built-in i18n support. In order to consume the catalog data, we must specify the desired [`LocalizedString`](https://docs.commercetools.com/api/types#localizedstring).
 
+### Why do we need the `FLUENT_WEBHOOK_NAME` env variable?
 
+- Since the Webhook endpoint will no have proteccion by default, we need to make sure only the Fluent Webhook will be able to trigger the endpoint. The `FLUENT_WEBHOOK_NAME` env variable will be used to validate the request.
 
 ## Useful links
 - https://lingo.fluentcommerce.com/asset-library/reference-modules/order/

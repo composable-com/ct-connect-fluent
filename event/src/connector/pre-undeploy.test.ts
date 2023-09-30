@@ -1,14 +1,8 @@
-import { createStandardProduct, createVariantProduct } from '../fluent/api'
-import { fluentLogin } from '../fluent/client'
-import { getFluentStandardProduct } from '../fluent/utils'
-
 import { deleteMySubscription } from './actions'
-
 import { preUndeploy, run } from './pre-undeploy'
 
 jest.mock('../utils/assert.utils')
 jest.mock('./actions')
-jest.mock('../fluent/client')
 jest.mock('../client/create.client', () => {
   return {
     createApiRoot: jest.fn().mockImplementation(() => ({
@@ -44,16 +38,7 @@ jest.mock('../client/create.client', () => {
     })),
   }
 })
-jest.mock('../fluent/utils', () => ({
-  getFluentStandardProduct: jest.fn().mockReturnValue({ name: 'mockProduct' }),
-  getFluentProductVariant: jest.fn(),
-  getFluentCategoriesFromCTCategories: jest.fn(),
-  getFluentCustomer: jest.fn(),
-  getFluentOrder: jest.fn(),
-  getFluentTransaction: jest.fn(),
-  getProductFluentCategories: jest.fn(),
-}))
-jest.mock('../fluent/api')
+
 jest.mock('../utils/logger.utils', () => {
   return {
     logger: {
@@ -65,7 +50,7 @@ jest.mock('../utils/logger.utils', () => {
 
 describe('pre-undeploy', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
     jest.restoreAllMocks()
   })
   it('should delete subscription', async () => {
@@ -77,30 +62,12 @@ describe('pre-undeploy', () => {
 
 describe('run', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
     jest.restoreAllMocks()
   })
   it('should delete subscription', async () => {
     await run()
 
     expect(deleteMySubscription).toHaveBeenCalled()
-  })
-
-  it('should login to fluent', async () => {
-    await run()
-
-    expect(fluentLogin).toHaveBeenCalled()
-  })
-  it('should loop through ct products and create in fluent', async () => {
-    await run()
-
-    expect(getFluentStandardProduct).toHaveBeenCalledWith({
-      productName: 'mockProduct',
-      productDescription: undefined,
-      productKey: 'mockKey',
-      productCategories: [],
-    })
-    expect(createStandardProduct).toHaveBeenCalledWith({ name: 'mockProduct' })
-    expect(createVariantProduct).toHaveBeenCalled()
   })
 })
