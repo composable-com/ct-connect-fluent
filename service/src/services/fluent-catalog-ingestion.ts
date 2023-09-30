@@ -54,6 +54,7 @@ export async function fluentCatalogIngestion() {
       }
 
       const productKey = product.key;
+
       const fluentStandardProduct = getFluentStandardProduct({
         productName: name[FLUENT_CATALOG_LOCALE],
         productDescription: description?.[FLUENT_CATALOG_LOCALE],
@@ -69,6 +70,8 @@ export async function fluentCatalogIngestion() {
           logger.info(`Some variants of this product have an SKU equal to the Standard Product Key ${productKey}`);
         }
 
+        if (allProductVariants.length === 0) return;
+        
         const validVariants = allProductVariants.filter(variant => variant.sku && variant.sku !== productKey)
         for await (const productVariant of validVariants) {
           await limiter.schedule(async() => {

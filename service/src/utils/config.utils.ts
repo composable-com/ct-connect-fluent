@@ -20,7 +20,7 @@ export const readConfiguration = () => {
     fluentClientSecret: process.env.FLUENT_CLIENT_SECRET as string,
     fluentUsername: process.env.FLUENT_USERNAME as string,
     fluentPassword: process.env.FLUENT_PASSWORD as string,
-    fluentCatalogLocale: (process.env.BLOOMREACH_ENGAGEMENT_CATALOG_LOCALE as string) || 'en-US',
+    fluentCatalogLocale: (process.env.FLUENT_CATALOG_LOCALE as string) || 'en-US',
     fluentRetailerId: Number(process.env.FLUENT_RETAILER_ID as string ?? ''),
     fluentWebHookName: process.env.FLUENT_WEBHOOK_NAME as string,
   };

@@ -33,4 +33,9 @@ describe('createApiRoot function', () => {
       projectKey: 'test-project-key',
     })
   })
+
+  it('should return the same API root if called multiple times', () => {
+    const apiRoot = createApiRoot()
+    expect(apiRoot).toBe(createApiRoot())
+  })
 })

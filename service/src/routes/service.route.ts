@@ -25,21 +25,21 @@ serviceRouter.post('/', async (req, res) => {
 
   if (!entityRef || !entityType || !entitySubtype || !entityStatus) {
     return res.status(400).send({ 
-      error: 'Invalid request.' 
+      error: 'Invalid request' 
     });
   }
 
   const ctOrderId = entityRef.split('HD_')[1];
-  if (!ctOrderId) return res.status(400).send({ error: 'Invalid request.' });
+  if (!ctOrderId) return res.status(400).send({ error: 'Invalid request' });
 
-  const apiRoot = createApiRoot();
-  const { body: { version: orderVersion } } = await apiRoot
+
+  const { body: { version: orderVersion } } = await createApiRoot()
     .orders()
     .withId({ ID: ctOrderId })
     .get()
     .execute();
-
-  await apiRoot
+    
+  await createApiRoot()
     .orders()
     .withId({ ID: ctOrderId })
     .post({
@@ -54,7 +54,7 @@ serviceRouter.post('/', async (req, res) => {
       },
     })
     .execute();
-  
+
   res.status(200);
   res.send();
 });

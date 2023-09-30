@@ -19,7 +19,7 @@ readConfiguration();
 const PORT = 8080;
 
 // Create the express app
-const app: Express = express();
+export const app: Express = express();
 app.disable('x-powered-by');
 
 // Define configurations
