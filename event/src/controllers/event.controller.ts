@@ -5,7 +5,6 @@ import { CreatedBy, MessageDeliveryPayload, Order, ProductProjection } from '@co
 import { getFluentCustomer, getFluentOrder, getFluentProductVariant, getFluentStandardProduct, getFluentTransaction, getProductFluentCategories } from '../fluent/utils';
 import { createFinancialTransaction, createOrder, createOrderAndCustomer, createStandardProduct, createVariantProduct, getCustomerByRef } from '../fluent/api';
 import { fluentLogin } from '../fluent/client';
-import CustomError from '../errors/custom.error';
 
 export interface CtEvent {
   message: {
@@ -28,7 +27,7 @@ export interface CtEventPayload extends MessageDeliveryPayload {
   version: number;
   sequenceNumber: number;
   resource: {
-    typeId: 'product';
+    typeId: 'product' | 'order';
     id: string;
   };
   resourceVersion: number;
@@ -53,11 +52,10 @@ const FLUENT_CATALOG_LOCALE = process.env.FLUENT_CATALOG_LOCALE ?? 'en-US';
  */
 export const post = async (request: Request, response: Response) => {
   try {
-    const payload = JSON.parse(
+    const payload: CtEventPayload = JSON.parse(
       Buffer.from(request.body.message.data, 'base64').toString()
-    );
+    ).data;
     logger.info('Event received');
-    logger.info(JSON.stringify(payload));
     await fluentLogin();
 
     const { type } = payload;
