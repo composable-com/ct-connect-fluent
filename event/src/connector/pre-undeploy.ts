@@ -1,5 +1,5 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import { config } from 'dotenv';
+config();
 
 import { assertError } from '../utils/assert.utils';
 import { deleteMySubscription } from './actions';

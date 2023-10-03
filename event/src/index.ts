@@ -1,5 +1,5 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { config } from 'dotenv';
+config();
 
 import express, { Express } from 'express';
 import bodyParser from 'body-parser';
