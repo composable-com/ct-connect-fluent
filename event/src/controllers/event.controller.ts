@@ -53,7 +53,9 @@ const FLUENT_CATALOG_LOCALE = process.env.FLUENT_CATALOG_LOCALE ?? 'en-US';
  */
 export const post = async (request: Request, response: Response) => {
   try {
-    const payload = JSON.parse(Buffer.from(request.body.message.data, 'base64').toString());
+    const payload: CtEventPayload = JSON.parse(
+      Buffer.from(request.body.message.data, 'base64').toString()
+    );
     logger.info('Event received');
     await fluentLogin();
 
