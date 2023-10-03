@@ -5,6 +5,7 @@ import { CreatedBy, MessageDeliveryPayload, Order, ProductProjection } from '@co
 import { getFluentCustomer, getFluentOrder, getFluentProductVariant, getFluentStandardProduct, getFluentTransaction, getProductFluentCategories } from '../fluent/utils';
 import { createFinancialTransaction, createOrder, createOrderAndCustomer, createStandardProduct, createVariantProduct, getCustomerByRef } from '../fluent/api';
 import { fluentLogin } from '../fluent/client';
+import CustomError from '../errors/custom.error';
 
 export interface CtEvent {
   message: {
@@ -51,14 +52,10 @@ const FLUENT_CATALOG_LOCALE = process.env.FLUENT_CATALOG_LOCALE ?? 'en-US';
  * @returns
  */
 export const post = async (request: Request, response: Response) => {
-  logger.info('Event received');
-  await fluentLogin();
-
   try {
-    const event: CtEvent = request.body.data;
-    const payload: CtEventPayload = JSON.parse(
-      Buffer.from(event.message.data, 'base64').toString()
-    ).data;
+    const payload = JSON.parse(Buffer.from(request.body.message.data, 'base64').toString());
+    logger.info('Event received');
+    await fluentLogin();
 
     const { type } = payload;
 
