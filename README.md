@@ -1,9 +1,10 @@
 # commercetools Fluent Commerce Connector
 
 The Fluent Commerce commercetools connector was created by [Orium](https://orium.com/), and provides the following features:
-- Ability to capture customer order events from commercetools to Fluent, including payment transaction details
-- Ability to initially load all products from commercetools to Fluent Commerce when the connector is installed
-- Ability to continuously synchronize products from commercetools to Fluent Commerce in near real-time
+- Ability to capture customer order events from commercetools to Fluent, including payment transaction details.
+- Ability to initially load all products from commercetools to Fluent Commerce when the connector is installed.
+- Ability to continuously synchronize products from commercetools to Fluent Commerce in near real-time.
+- Ability to update Order status on commercetools when the order is completed on Fluent Commerce.
 
 ## Overview
 
@@ -35,6 +36,8 @@ Setup the required environment variables when you [create the deployment](https:
 - `FLUENT_CATALOGUE_REF`
 - `FLUENT_RETAILER_ID`
 - `FLUENT_CATALOG_LOCALE`
+
+For service you will need to add the following environment variables:
 - `FLUENT_WEBHOOK_NAME`
 - `BASIC_AUTH_SECRET`
 
@@ -69,7 +72,7 @@ The url will look like this `https://service-2da6408a-5e4e-493e-a413-c248f2c3717
 
 ```bash
 curl -u {{ CTP_PROJECT_KEY }}:{{ BASIC_AUTH_SECRET }} \
-https://service-2da6408a-5e4e-493e-a413-c248f2c37174.us-central1.gcp.preview.commercetools.app/service/bloomreach-discovery-catalog-ingestion
+https://service-2da6408a-5e4e-493e-a413-c248f2c37174.us-central1.gcp.preview.commercetools.app/service/fluent-catalog-ingestion
 ```
 
 > _Replace `{{ CTP_PROJECT_KEY }}` and `{{ BASIC_AUTH_SECRET }}` with the values you used when creating the deployment._
@@ -108,6 +111,10 @@ When an order is updated on Fluent, an WebHook will be triggered and the connect
 ### Why do we need the `FLUENT_CATALOG_LOCALE` env variable?
 
 - By default, commercetools has built-in i18n support. In order to consume the catalog data, we must specify the desired [`LocalizedString`](https://docs.commercetools.com/api/types#localizedstring).
+
+### What is the `BASIC_AUTH_SECRET` env variable for?
+
+- Fluent will consume products data from an endpoint exposed by the connector. This endpoint is secured using a [basic http authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication), where the username is the `CTP_PROJECT_KEY` and the password the `BASIC_AUTH_SECRET`.
 
 ### Why do we need the `FLUENT_WEBHOOK_NAME` env variable?
 

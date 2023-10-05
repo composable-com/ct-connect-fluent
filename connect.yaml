@@ -38,8 +38,8 @@ deployAs:
     applicationType: service
     endpoint: /service
     scripts:
-      postDeploy: npm install && npm run build && npm run connector:post-deploy
-      preUndeploy: npm install && npm run build && npm run connector:pre-undeploy
+      postDeploy: npm install && npm run build
+      preUndeploy: npm install && npm run build
     configuration:
       standardConfiguration:
         - key: CTP_REGION

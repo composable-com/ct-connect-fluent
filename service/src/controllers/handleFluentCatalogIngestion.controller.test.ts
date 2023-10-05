@@ -82,8 +82,6 @@ describe('getHandleFluentCatalogIngestion', () => {
     expect(fluentCatalogIngestionSpy).toHaveBeenCalled();
 
     // Verify that the response methods are called correctly
-    expect(res.contentType).toHaveBeenCalledWith('application/javascript');
-    expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({ success: true });
   });
 });

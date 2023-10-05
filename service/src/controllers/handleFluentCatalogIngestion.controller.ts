@@ -17,7 +17,5 @@ export async function getHandleFluentCatalogIngestion(
 
 export async function controllerHandler(res: Response) {
   fluentCatalogIngestion();
-  res.contentType('application/javascript');
-  res.status(200);
   res.send({ success: true });
 }
