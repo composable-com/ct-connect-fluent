@@ -128,24 +128,24 @@ export const formatCommercetoolsMoney = (money?: TypedMoney) => {
   return (money?.centAmount ?? 0) / Math.pow(10, money?.fractionDigits ?? 2);
 };
 
-const getDefaultAddress = (addresses: any[]) => {
+export const getDefaultAddress = (addresses: any[]) => {
   if (addresses.length === 1) {
     return addresses[0];
   }
 
-  return addresses.find((address) => address.isDefaultShippingAddress);
+  return addresses.find((address) => address.isDefaultShippingAddress) ?? addresses[0];
 }
 
 export const getFluentCustomer = (customer: Customer) => {
   const defaultAddress = getDefaultAddress(customer.addresses ?? []);
 
   return {
-    username: customer.email!,
+    username: customer.email,
     department: defaultAddress?.department ?? '',
     country: defaultAddress?.country ?? '',
     firstName: customer.firstName ?? '',
     lastName: customer.lastName ?? '',
-    primaryEmail: customer.email ?? '',
+    primaryEmail: customer.email,
     primaryPhone: defaultAddress?.phone ?? '',
     timezone: defaultAddress?.timeZone ?? '',
     promotionOptIn: true,
@@ -184,7 +184,7 @@ export const getFluentOrder = (order: Order, customerId?: number | undefined): F
     fulfilmentChoice: {
       deliveryType: 'STANDARD',
       deliveryAddress: {
-        ref: shippingAddress?.id ?? '', // What should I use here?
+        ref: shippingAddress?.id ?? '',
         name: (shippingAddress?.firstName  ?? '') + (shippingAddress?.lastName ?? ''),
         street: shippingAddress?.streetName ?? '',
         city: shippingAddress?.city ?? '',
@@ -219,8 +219,8 @@ export const getFluentTransaction = (payment: Payment, orderId: number): CreateF
     type: 'PAYMENT',
     amount: formatCommercetoolsMoney(lastTransaction.amount),
     currency: lastTransaction.amount.currencyCode,
-    paymentMethod: payment.paymentMethodInfo.method ?? '',
-    paymentProvider: payment.paymentMethodInfo.paymentInterface ?? '',
+    paymentMethod: payment.paymentMethodInfo.method,
+    paymentProvider: payment.paymentMethodInfo.paymentInterface,
     order: {
       id: orderId
     }

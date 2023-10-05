@@ -8,6 +8,7 @@ import {
   getFluentCustomer,
   getFluentOrder,
   getFluentTransaction,
+  getDefaultAddress,
 } from './utils';
 
 describe('getFluentStandardProduct', () => {
@@ -39,6 +40,19 @@ describe('getFluentStandardProduct', () => {
         categoryRefs: ['Category1', 'Category2'],
       },
     });
+  });
+
+  it('should return a FluentStandardProduct null if the product does not have name', () => {
+    const params = {
+      productName: '',
+      productCategories: ['Category1', 'Category2'],
+      productDescription: 'Test Description',
+      productKey: '123456',
+    };
+
+    const result = getFluentStandardProduct(params);
+
+    expect(result).toBeNull;
   });
 });
 
@@ -232,6 +246,63 @@ describe('getFluentOrder', () => {
       customer: { id: expect.any(Number) },
     });
   });
+
+  it('should return a FluentOrder with customer if exists', () => {
+    const order = {
+      id: 'Order123',
+      totalPrice: { currencyCode: 'USD', centAmount: 1000 },
+      lineItems: [{ variant: { sku: 'SKU123' }, quantity: 2, price: { value: { currencyCode: 'USD', centAmount: 500 } } }],
+      taxedPrice: { totalTax: { currencyCode: 'USD', centAmount: 100 }, totalGross: { currencyCode: 'USD', centAmount: 1100 } },
+      shippingAddress: {
+        id: 'Address123',
+        firstName: 'John',
+        lastName: 'Doe',
+        streetName: '123 Main St',
+        city: 'City',
+        postalCode: '12345',
+        state: 'State',
+        country: 'Country',
+      },
+    };
+
+    // @ts-ignore
+    const result = getFluentOrder(order, 123);
+
+    expect(result).toEqual({
+      ref: 'HD_Order123',
+      retailer: { id: expect.any(Number) },
+      type: 'HD',
+      totalPrice: 10.0,
+      totalTaxPrice: 1.0,
+      items: [
+        {
+          ref: 'SKU123',
+          productRef: 'SKU123',
+          productCatalogueRef: expect.any(String),
+          quantity: 2,
+          price: 5.0,
+          paidPrice: 0,
+          totalPrice: 0,
+          taxPrice: 0,
+          totalTaxPrice: 0,
+          currency: 'USD',
+        },
+      ],
+      fulfilmentChoice: {
+        deliveryType: 'STANDARD',
+        deliveryAddress: {
+          ref: 'Address123',
+          name: 'JohnDoe',
+          street: '123 Main St',
+          city: 'City',
+          postcode: '12345',
+          state: 'State',
+          country: 'Country',
+        },
+      },
+      customer: { id: 123 },
+    });
+  });
 });
 
 describe('getFluentTransaction', () => {
@@ -254,5 +325,31 @@ describe('getFluentTransaction', () => {
       paymentProvider: 'Stripe',
       order: { id: 123 },
     });
+  });
+});
+
+describe('getDefaultAddress', () => {
+  it('should return the default shipping address if there is one', () => {
+    const addresses = [
+      { isDefaultShippingAddress: false, street: '123 Main St' },
+      { isDefaultShippingAddress: true, street: '456 Elm St' },
+      { isDefaultShippingAddress: false, street: '789 Oak St' },
+    ];
+
+    const result = getDefaultAddress(addresses);
+
+    expect(result).toEqual({ isDefaultShippingAddress: true, street: '456 Elm St' });
+  });
+
+  it('should return the first address if there is no default shipping address', () => {
+    const addresses = [
+      { isDefaultShippingAddress: false, street: '123 Main St' },
+      { isDefaultShippingAddress: false, street: '456 Elm St' },
+      { isDefaultShippingAddress: false, street: '789 Oak St' },
+    ];
+
+    const result = getDefaultAddress(addresses);
+
+    expect(result).toEqual({ isDefaultShippingAddress: false, street: '123 Main St' });
   });
 });

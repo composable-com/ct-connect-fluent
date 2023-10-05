@@ -65,7 +65,7 @@ export const post = async (request: Request, response: Response) => {
       // We only want to process products with a key
       if (!productProjection || !productProjection?.key) {
         logger.error(`Product not processed:  Product does not have a key: ${productProjection?.id}`);
-        return;
+        return response.status(204).send();
       }
 
       logger.info(`Processing ProductPublished: ${productProjection.key}`);
@@ -82,7 +82,7 @@ export const post = async (request: Request, response: Response) => {
       if (fluentStandardProduct) {      
         await createStandardProduct(fluentStandardProduct);
         const createFluentProductVariants = [masterVariant ,...variants]
-          .filter(variant => variant.sku)
+          .filter(variant => variant.sku && variant.sku !== key)
           .map(variant => 
             getFluentProductVariant({ 
               product: variant, 
@@ -106,7 +106,7 @@ export const post = async (request: Request, response: Response) => {
       const { order } = payload;
       if (!order || !order?.customerEmail || !order?.customerId) {
         logger.info(`Order not processed:  Order does not have customerEmail or customerId: ${order?.id}`);
-        return;
+        return response.status(204).send();
       }
 
       logger.info(`Processing OrderCreated: ${order.id}`);

@@ -2,7 +2,7 @@
 
 The Fluent Commerce commercetools connector was created by [Orium](https://orium.com/), and provides the following features:
 - Ability to capture customer order events from commercetools to Fluent, including payment transaction details.
-- Ability to initially load all products from commercetools to Fluent Commerce when the connector is installed.
+- Ability to initially load all products from commercetools to Fluent Commerce when the connector is installed. See [Caveats](#caveats) for more details.
 - Ability to continuously synchronize products from commercetools to Fluent Commerce in near real-time.
 - Ability to update Order status on commercetools when the order is completed on Fluent Commerce.
 
@@ -21,7 +21,8 @@ This is achieved through a POST endpoint which receives the event, processes it,
 ## Installing the connector
 In order to install the connector in your commercetools project, you'll need to deploy it. Refer to the [commercetools connect deployment documentation](https://docs.commercetools.com/connect/concepts#deployments).
 
-Setup the required environment variables when you [create the deployment](https://docs.commercetools.com/connect/getting-started#create-a-deployment):
+Service and Event applications needs setup the required environment variables when you [create the deployment](https://docs.commercetools.com/connect/getting-started#create-a-deployment):
+
 
 - `CTP_CLIENT_ID`
 - `CTP_CLIENT_SECRET`
@@ -37,7 +38,7 @@ Setup the required environment variables when you [create the deployment](https:
 - `FLUENT_RETAILER_ID`
 - `FLUENT_CATALOG_LOCALE`
 
-For service you will need to add the following environment variables:
+For service you additionally will need the following environment variables:
 - `FLUENT_WEBHOOK_NAME`
 - `BASIC_AUTH_SECRET`
 
@@ -79,6 +80,10 @@ https://service-2da6408a-5e4e-493e-a413-c248f2c37174.us-central1.gcp.preview.com
 > 
 > _Replace `https://service-2da6408a-5e4e-493e-a413-c248f2c37174.us-central1.gcp.preview.commercetools.app/service` with the service url you got in the previous step._
 
+
+## Caveats
+
+The connector is designed to load all products at once, which might result in extended HTTP request times, potentially exceeding predefined limits. We anticipate that it will handle a modest number products, likely no more than a 200. The exact capacity may fluctuate due to various variables. Feel free to get in touch with us if this is a limitation for your project.
 
 ## How it works
 

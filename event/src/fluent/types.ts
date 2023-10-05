@@ -90,9 +90,9 @@ export interface CreateFinancialTransactionInput {
   currency: string
   externalTransactionCode?: string
   externalTransactionId?: string
-  cardType?: string;
-  paymentMethod: string
-  paymentProvider: string
+  cardType?: string
+  paymentMethod: string | undefined
+  paymentProvider: string | undefined
   order: {
     id: number
   }

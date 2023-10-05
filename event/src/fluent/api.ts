@@ -1,7 +1,7 @@
 import { FluentClient, fluentGraphQL } from "./client";
 import { FluentVariantProduct, FluentStandardProduct, FluentCategory, FluentOrder, GraphQlInput, CreateOrderInput, CreateFinancialTransactionInput, CreateOrderAndCustomerInput } from "./types";
 
-const FLUENT_HOST = process.env.FLUENT_HOST ?? '';
+const FLUENT_HOST = process.env.FLUENT_HOST;
 
 export const createCategory = (category: FluentCategory) => {
   return FluentClient.post(`${FLUENT_HOST}/api/v4.1/event/async`, category);

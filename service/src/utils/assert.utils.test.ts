@@ -28,6 +28,14 @@ describe('assertError', () => {
       'Assertion failed: Value is an Error'
     );
   });
+
+  it('should throw an error with default message when message is not provided', () => {
+    // Negative test case
+    const nonErrorValue = 'Not an error';
+    expect(() => assertError(nonErrorValue)).toThrowError(
+      'Assertion failed: Invalid error value'
+    );
+  });
 });
 
 describe('assertString', () => {
@@ -42,6 +50,14 @@ describe('assertString', () => {
     const nonStringValue = 42; // Not a string
     expect(() => assertString(nonStringValue, 'Value is a string')).toThrowError(
       'Assertion failed: Value is a string'
+    );
+  });
+
+  it('should throw an error with default message when message is not provided', () => {
+    // Negative test case
+    const nonStringValue = 42; // Not a string
+    expect(() => assertString(nonStringValue)).toThrowError(
+      'Assertion failed: Invalid string value'
     );
   });
 });
