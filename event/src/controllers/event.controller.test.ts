@@ -92,15 +92,7 @@ describe('post function', () => {
       },
     }
 
-    const fakeEvent: any = {
-      message: {
-        data: Buffer.from(JSON.stringify({ data: fakeData })).toString(
-          'base64'
-        ),
-      },
-    }
-
-    mockRequest.body = { data: fakeEvent }
+    mockRequest.body = { message: { data: Buffer.from(JSON.stringify({ data: fakeData })) } }
 
     await post(mockRequest as Request, mockResponse as Response)
 
